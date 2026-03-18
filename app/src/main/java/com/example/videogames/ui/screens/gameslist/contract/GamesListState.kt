@@ -1,4 +1,4 @@
-package com.example.videogames.ui.screens.gameslist
+package com.example.videogames.ui.screens.gameslist.contract
 
 import com.example.videogames.domain.model.Game
 import com.example.videogames.domain.model.Genre

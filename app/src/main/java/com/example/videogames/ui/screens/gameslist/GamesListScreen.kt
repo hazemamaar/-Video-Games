@@ -34,6 +34,9 @@ import com.example.videogames.ui.components.GameCard
 import com.example.videogames.ui.components.GenreChips
 import com.example.videogames.ui.components.PaginationLoading
 import com.example.videogames.ui.components.SearchBar
+import com.example.videogames.ui.screens.gameslist.contract.GamesListIntent
+import com.example.videogames.ui.screens.gameslist.contract.GamesListState
+import com.example.videogames.ui.screens.gameslist.logic.GamesListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -19,7 +19,6 @@ interface Event // Represents one time events
  * Base ViewModel to handle UI state, user intents, and one-time events.
  *
  * @param S Represents the UI state.
- * @param E Represents one-time events.
  * @param I Represents user intents or actions.
  */
 abstract class BaseViewModel<S : State, I : Intent>(initialState: S) : ViewModel() {

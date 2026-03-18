@@ -45,6 +45,7 @@ import com.example.videogames.ui.components.ErrorState
 import com.example.videogames.ui.components.FullScreenLoading
 import com.example.videogames.ui.components.RatingBar
 import com.example.videogames.ui.screens.gamedetails.contract.GameDetailsIntent
+import com.example.videogames.ui.screens.gamedetails.contract.GameDetailsState
 import com.example.videogames.ui.screens.gamedetails.logic.GameDetailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,16 +55,19 @@ fun GameDetailsScreen(
     onBackClick: () -> Unit,
     viewModel: GameDetailsViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.viewState.collectAsState()
     LaunchedEffect(gameId) {
-        viewModel.processIntent(GameDetailsIntent.LoadDetails(gameId))
+        viewModel.sendIntent(GameDetailsIntent.LoadDetails(gameId))
     }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = state.game?.name ?: "Game Details",
+                        text = when (state) {
+                            is GameDetailsState.Idle -> "Game Details"
+                            is GameDetailsState.Loaded -> state.game?.name ?: "Game Details"
+                        },
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
@@ -88,18 +92,25 @@ fun GameDetailsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                state.isLoading && state.game == null -> {
+            when (val gameDetailsState = state) {
+                is GameDetailsState.Idle -> {
                     FullScreenLoading()
                 }
-                state.error != null && state.game == null -> {
-                    ErrorState(
-                        message = state.error!!,
-                        onRetry = { viewModel.processIntent(GameDetailsIntent.Retry(gameId)) }
-                    )
-                }
-                state.game != null -> {
-                    GameDetailsContent(game = state.game!!)
+                is GameDetailsState.Loaded -> {
+                    when {
+                        gameDetailsState.isLoading && gameDetailsState.game == null -> {
+                            FullScreenLoading()
+                        }
+                        gameDetailsState.error != null && gameDetailsState.game == null -> {
+                            ErrorState(
+                                message = gameDetailsState.error,
+                                onRetry = { viewModel.sendIntent(GameDetailsIntent.Retry(gameId)) }
+                            )
+                        }
+                        gameDetailsState.game != null -> {
+                            GameDetailsContent(game = gameDetailsState.game!!)
+                        }
+                    }
                 }
             }
         }

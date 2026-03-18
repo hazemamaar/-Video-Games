@@ -1,4 +1,4 @@
-package com.example.videogames.ui.screens.gameslist
+package com.example.videogames.ui.screens.gameslist.logic
 
 import androidx.lifecycle.viewModelScope
 import com.example.videogames.core.response.Resource
@@ -7,6 +7,8 @@ import com.example.videogames.domain.model.Game
 import com.example.videogames.domain.model.Genre
 import com.example.videogames.domain.usecase.GetGamesByGenreUseCase
 import com.example.videogames.domain.usecase.GetGenresUseCase
+import com.example.videogames.ui.screens.gameslist.contract.GamesListIntent
+import com.example.videogames.ui.screens.gameslist.contract.GamesListState
 import com.example.videogames.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,7 +22,7 @@ class GamesListViewModel @Inject constructor(
 
     init {
         super.sendIntent(GamesListIntent.LoadGames)
-        loadGenres()
+        this.loadGenres()
     }
 
     override fun handleIntent(intent: GamesListIntent) {
@@ -29,7 +31,10 @@ class GamesListViewModel @Inject constructor(
             is GamesListIntent.LoadNextPage -> this.loadNextPage()
             is GamesListIntent.SearchQuery -> this.search(intent.query)
             is GamesListIntent.SelectGenre -> this.selectGenre(intent.genre)
-            is GamesListIntent.Retry -> this.loadGames(resetPage = true)
+            is GamesListIntent.Retry -> {
+                this.loadGenres()
+                this.loadGames(resetPage = true)
+            }
         }
     }
 
@@ -48,7 +53,7 @@ class GamesListViewModel @Inject constructor(
                                 }
                             }
                         }
-                        
+
                         // Auto-select first genre if none selected
                         val currentState = viewState.value
                         if (currentState is GamesListState.Loaded) {
@@ -73,7 +78,7 @@ class GamesListViewModel @Inject constructor(
             is GamesListState.Idle -> Constants.DEFAULT_GENRE
             is GamesListState.Loaded -> currentState.selectedGenre?.slug ?: Constants.DEFAULT_GENRE
         }
-        
+
         val page = when (currentState) {
             is GamesListState.Idle -> 1
             is GamesListState.Loaded -> if (resetPage) 1 else currentState.currentPage
@@ -179,7 +184,7 @@ class GamesListViewModel @Inject constructor(
         val currentState = viewState.value
         if (currentState is GamesListState.Loaded) {
             if (currentState.isPaginationLoading || !currentState.hasMorePages) return
-            
+
             updateState { state ->
                 when (state) {
                     is GamesListState.Idle -> state
