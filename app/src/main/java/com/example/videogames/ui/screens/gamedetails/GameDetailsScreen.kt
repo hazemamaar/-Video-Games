@@ -64,9 +64,9 @@ fun GameDetailsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = when (state) {
+                        text = when (val currentState=state) {
                             is GameDetailsState.Idle -> "Game Details"
-                            is GameDetailsState.Loaded -> state.game?.name ?: "Game Details"
+                            is GameDetailsState.Loaded -> currentState.game?.name ?: "Game Details"
                         },
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
