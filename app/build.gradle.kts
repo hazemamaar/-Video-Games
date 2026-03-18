@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -40,20 +44,54 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
+    uiLibs()
+    remoteProvider()
+    localProvider()
+    dependencyInjection()
+    imageLoader()
+    testImplementation()
+}
+
+private fun DependencyHandlerScope.testImplementation() {
+    testImplementation(libs.junit)
+}
+
+private fun DependencyHandlerScope.remoteProvider() {
+    implementation(libs.gson)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+}
+
+private fun DependencyHandlerScope.localProvider() {
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+}
+
+private fun DependencyHandlerScope.dependencyInjection() {
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+}
+
+private fun DependencyHandlerScope.imageLoader() {
+    implementation(libs.coil.compose)
+}
+
+private fun DependencyHandlerScope.uiLibs() {
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
